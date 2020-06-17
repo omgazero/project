@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    html {
+      overflow: hidden;
+    }
+
+    body {
+      background: #000000;
+    }
+
+    #toggle {
+      position: absolute;
+      left: 60vw;
+    }
+
+    #container {
+      width: 720px;
+      height: 720px;
+    }
+  </style>
+</head>
+
+<body>
+<div id="info">Box
+  <br>
+  <button id="toggle" style="width:20%">Toggle Camera</button>
+  <canvas id='mycanvas' style="width:100vh;height:100vh"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://rawgit.com/mrdoob/three.js/master/examples/js/loaders/MTLLoader.js"></script>
+<script src="https://rawgit.com/mrdoob/three.js/master/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
+<script>
+var scene, renderer, camera, acamera;
+var L, near;
+var actingCamera;
+var cameraSphere;
+var keyboard;
+var index = 0
+
+init();
+animate();
+
+$("#toggle").click(function() {
+	if (actingCamera === camera) {
+  	actingCamera = acamera;
+  } else
+  	actingCamera = camera;
+});
+
+
+function init() {
+  L = 30;
+  near = L/2;
+	keyboard = new KeyboardState();
+
+	scene = new THREE.Scene();
+  let cc = document.getElementById('mycanvas');
+  renderer = new THREE.WebGLRenderer({canvas:cc});
+  let size = $('#mycanvas').innerHeight();
+  console.log ('size' + size)
+  renderer.setSize(size,size);
+  renderer.setClearColor(0x000000);
+  document.body.appendChild(renderer.domElement);
+
+  camera = new THREE.PerspectiveCamera(90,1, 1, 1000);
+  camera.position.z = near;
+  //let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+	acamera = new THREE.PerspectiveCamera ();
+  acamera.position.set (0,0,near);
+  makePerspective();
+	actingCamera = acamera;
+
+  //cameraSphere = new THREE.Mesh (new THREE.SphereGeometry (2,20,20), new THREE.MeshNormalMaterial())
+  //scene.add (cameraSphere);
+
+	///////////////
+	let grid = new THREE.GridHelper (L, 10, 'red', 'red');
+  let grid0 = grid.clone();
+  grid0.position.set (0, L/2, -L/2);
+  scene.add (grid0);
+  let grid1 = grid.clone();
+  grid1.position.set (0, -L/2, -L/2);
+  scene.add (grid1);
+
+	let grid2 = grid.clone();
+  grid2.position.set (L/2, 0, -L/2);
+  grid2.rotation.z = Math.PI/2;
+  scene.add (grid2);
+
+	let grid3 = grid.clone();
+  grid3.position.set (-L/2, 0, -L/2);
+  grid3.rotation.z = Math.PI/2;
+  scene.add (grid3);
+
+	let grid4 = grid.clone();
+  grid4.position.set (0, 0, -L);
+  grid4.rotation.x = Math.PI/2;
+  scene.add (grid4);
+
+	/*let axes = new THREE.AxesHelper (10);
+	scene.add (axes);*/
+	//readModel(scene, 'Astronaut');
+
+	var geometry = new THREE.BoxGeometry( 1, 1, L, 1, 1, 1 );
+	var material = new THREE.MeshNormalMaterial();
+
+	var geometryC = new THREE.CircleGeometry(2, 32);
+	var materialC = new THREE.MeshNormalMaterial();
+	var light = new THREE.AmbientLight( 0xffffff ); // soft white light
+	scene.add( light );
+	var box2 = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, L/5, 1, 1, 1 ), material );
+	box2.position.x = 5;
+	box2.position.y = 5;
+	box2.position.z = -L+L/10;
+	var circle2 = new THREE.Mesh( geometryC, materialC );
+	circle2.position.set(5, 5, -L+L/5)
+
+	var box3 = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, L/3, 1, 1, 1 ), material );
+	box3.position.x = -8;
+	box3.position.y = 3;
+	box3.position.z = -L+L/6;
+	var circle3 = new THREE.Mesh( geometryC, materialC );
+	circle3.position.set(-8, 3, -L+L/3)
+
+	var box4 = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, L/2, 1, 1, 1 ), material );
+	box4.position.x = -5;
+	box4.position.y = -10;
+	box4.position.z = -L+L/4;
+	var circle4 = new THREE.Mesh( geometryC, materialC );
+	circle4.position.set(-5, -10, -L+L/2)
+
+	//scene.add( box1 );
+	scene.add( box2 );
+	scene.add( box3 );
+	scene.add( box4 );
+	scene.add(circle2, circle3, circle4)
+}
+
+function makePerspective() {
+	// set parameters
+  let x = acamera.position.x;
+  let y = acamera.position.y;
+
+	let left = -(L/2+x);
+  let right = L/2-x;
+  let top = L/2-y;
+  let bottom = -(L/2+y);
+  let far = near + L;
+
+	acamera.projectionMatrix.makePerspective (left, right, top, bottom, near, far);
+}
+
+function animate() {
+
+	/*var am = scene.getObjectByName('OBJ0');
+	if(am != undefined){
+		//console.log(am.position);
+		am.position.set(0, -L/2+5, -10)
+	}*/
+	keyboard.update();
+  if (actingCamera === acamera){
+    if (keyboard.pressed('W'))
+      acamera.position.y += 0.1;
+    if (keyboard.pressed('S'))
+      acamera.position.y -= 0.1;
+    if (keyboard.pressed('A'))
+      acamera.position.x -= 0.1;
+    if (keyboard.pressed('D'))
+      acamera.position.x += 0.1;
+    }
+
+  if (actingCamera === camera){
+    if (keyboard.pressed('W'))
+      camera.position.y += 0.1;
+    if (keyboard.pressed('S'))
+      camera.position.y -= 0.1;
+    if (keyboard.pressed('A'))
+      camera.position.x -= 0.1;
+    if (keyboard.pressed('D'))
+      camera.position.x += 0.1;
+    }
+  //cameraSphere.position.copy (acamera.position);
+  makePerspective();
+
+  requestAnimationFrame(animate);
+  renderer.render(scene, actingCamera);
+}
+
+function unitize (object, targetSize) {
+
+	// find bounding box of 'object'
+	var box3 = new THREE.Box3();
+	box3.setFromObject (object);
+	var size = new THREE.Vector3();
+	size.subVectors (box3.max, box3.min);
+	var center = new THREE.Vector3();
+	center.addVectors(box3.max, box3.min).multiplyScalar (0.5);
+
+	console.log ('center: ' + center.x + ', '+center.y + ', '+center.z );
+	console.log ('size: ' + size.x + ', ' +  size.y + ', '+size.z );
+
+	// uniform scaling according to objSize
+	var objSize = Math.max (size.x, size.y, size.z);
+	var scaleSet = targetSize/objSize;
+
+	var theObject =  new THREE.Object3D();
+	theObject.add (object);
+	object.scale.set (scaleSet, scaleSet, scaleSet);
+	object.position.set (-center.x*scaleSet, -center.y*scaleSet, -center.z*scaleSet);
+
+	return theObject;
+
+}
+function readModel (sceneAdd, modelName, targetSize = 10) {
+  var onProgress = function(xhr) {
+	if (xhr.lengthComputable) {
+	  var percentComplete = xhr.loaded / xhr.total * 100;
+	  console.log(Math.round(percentComplete, 2) + '% downloaded');
+	}
+  };
+  var onError = function(xhr) {};
+  var mtlLoader = new THREE.MTLLoader();
+  mtlLoader.setPath('models/');
+  mtlLoader.load(modelName+'.mtl', function(materials) {
+	materials.preload();
+	var objLoader = new THREE.OBJLoader();
+	objLoader.setMaterials(materials);
+	objLoader.setPath('models/');
+	objLoader.load(modelName+'.obj', function(object) {
+
+		let theObject =  unitize (object, targetSize);
+		//theObject.add ( new THREE.BoxHelper (theObject) );
+		theObject.name = 'OBJ' + index;
+		index++;
+		sceneAdd.add (theObject);
+
+	}, onProgress, onError);
+  });
+}
+
+</script>
+</body>
+
+</html>

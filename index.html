@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <style>
+    html {
+      overflow: hidden;
+    }
+
+    body {
+      background: #000000;
+    }
+
+    #toggle {
+      position: absolute;
+      left: 60vw;
+    }
+
+    #container {
+      width: 720px;
+      height: 720px;
+    }
+    #so {
+      position: absolute;
+      right:30vw;
+      top:15vh;
+      font-size:2em;
+      color:yellow;
+    }
+    video,
+    canvas {
+      margin-left: 0px;
+      margin-top: 0px;
+      position: absolute;
+    }
+
+    .demo-frame {
+      position: absolute;
+      width: 540px;
+      height: 480px;
+      z-index: 2;
+      right: 50px;
+      bottom: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="so">還剩3個目標</div>
+  <input type="button" id="toggle" value="toggle"></input>
+  <div id="container"></div>
+  <div class="demo-frame">
+    <div class="demo-container">
+      <video id="video" width="540" height="480" preload autoplay loop muted></video>
+      <canvas id="canvas" width="540" height="480"></canvas>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js"></script>
+  <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.3.0/Tween.min.js"></script>
+  <script src="./build/tracking-min.js"></script>
+  <script src="./build/data/face-min.js"></script>
+
+  <script src="./playerControll.js"></script>
+  <script src="./makePerspective.js"></script>
+  <script src="./dissolve.js"></script>
+  <script src="./eventListener.js"></script>
+  <script src="./tracking.js"></script>
+  <script src="./frontSight.js"></script>
+  <script src="./Dungeon.js"></script>
+  <script src="./main.js"></script>
+</body>
+
+</html>
